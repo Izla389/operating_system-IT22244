@@ -1,0 +1,213 @@
+Operating Systems IT 2244 
+
+COMMAND PROMPT PRACTICAL
+
+Creating a comma seperated file
+----------------------------------------------------------------------
+
+Objective:
+----------------------------------------------------------------------
+The objective of this practical is to create an empty file and retrive the data(specific colum or line). 
+The script will create directories based on predefined criteria and standards for each criterion.
+
+Steps to Create the Batch Script:
+----------------------------------------------------------------------
+
+1.login 
+login as: 2021ict30
+2021ict30@172.16.140.150's password:
+Last login: Mon Mar 24 11:49:33 2025 from 172.16.140.39
+
+[2021ict30@fedora ~]$ ls
+abc.txt  file.txt  prgram.sh
+
+1.create an empty file nsmed dsy28.csv (comma seperated file)
+[2021ict30@fedora ~]$ touch day28.csv
+
+2.allow to edit
+[2021ict30@fedora ~]$ vi day28.csv
+press i
+
+3.type comma seperated data
+
+ID,name,age,salary,department
+101,Alice,30,70000,data science
+102,bob,25,50000,engineering
+103,charlie,50,80000,data science
+104,david,40,100000,HR
+105,eve,28,60000,engineering
+106,frank,38,75000,HR
+107,grace,27,72000,data science
+109,ivy,29,62000,data science
+110,jack,31,71000,HR
+
+4.save the file 
+escape :wq!
+
+5.see saved file
+
+[2021ict30@fedora ~]$ more day28.csv
+ID,name,age,salary,department
+101,Alice,30,70000,data science
+102,bob,25,50000,engineering
+103,charlie,5,80000,data science
+104,david,40,0000,HR
+105,eve,28,60000,engineering
+106,frank,38,75000,HR
+107,grace,27,72000,data science
+108,frank,38,75000,HR
+109,ivy,29,62000,data science
+110,jack,31,71000,HR
+
+6.used to view the contents of a file one page at a time without opening an editor.
+
+[2021ict30@fedora ~]$ less day28.csv
+
+7.searches for and displays all lines in day28.csv that contain the word "engineering"
+The grep command is used to search for a specific pattern in a file.
+
+[2021ict30@fedora ~]$ grep 'engineering' day28.csv
+102,bob,25,50000,engineering
+105,eve,28,60000,engineering
+
+8.print first 7 lines 
+
+[2021ict30@fedora ~]$ head -n7 day28.csv
+ID,name,age,salary,department
+101,Alice,30,70000,data science
+102,bob,25,50000,engineering
+103,charlie,5,80000,data science
+104,david,40,0000,HR
+105,eve,28,60000,engineering
+106,frank,38,75000,HR
+
+9.prints only the 7th line of day28.csv. 
+
+[2021ict30@fedora ~]$ sed -n '7p' day28.csv
+106,frank,38,75000,HR
+
+10.prints only the 3rd line of day28.csv. 
+
+[2021ict30@fedora ~]$ awk 'NR==3' day28.csv
+102,bob,25,50000,engineering
+
+11.command extracts and displays the 3rd field (column) from day28.csv, using a comma (,) as the delimiter. 
+
+[2021ict30@fedora ~]$ cut -d, -f3 day28.csv
+age
+30
+25
+5
+40
+28
+38
+27
+38
+29
+31
+
+12.command sorts day28.csv numerically (-n) based on the 4th column 
+(salary, in this case), using a comma (',') as the field delimiter.
+
+[2021ict30@fedora ~]$ sort -t',' -k4,4n day28.csv
+104,david,40,0000,HR
+ID,name,age,salary,department
+102,bob,25,50000,engineering
+105,eve,28,60000,engineering
+109,ivy,29,62000,data science
+101,Alice,30,70000,data science
+110,jack,31,71000,HR
+107,grace,27,72000,data science
+106,frank,38,75000,HR
+108,frank,38,75000,HR
+103,charlie,5,80000,data science
+
+13.extracts and prints the 2nd and 3rd columns (separated by a space)
+from day28.csv, using a comma (',') as the field separator. 
+
+[2021ict30@fedora ~]$ awk -F',' '{print $2,$3}' day28.csv
+name age
+Alice 30
+bob 25
+charlie 5
+david 40
+eve 28
+frank 38
+grace 27
+frank 38
+ivy 29
+jack 31
+
+14.command sorts day28.csv in descending numerical order (-nr) based on
+the 4th column (salary), using a comma (',') as the field delimiter.
+
+[2021ict30@fedora ~]$ sort -t',' -k4,4nr day28.csv
+103,charlie,5,80000,data science
+106,frank,38,75000,HR
+108,frank,38,75000,HR
+107,grace,27,72000,data science
+110,jack,31,71000,HR
+101,Alice,30,70000,data science
+109,ivy,29,62000,data science
+105,eve,28,60000,engineering
+102,bob,25,50000,engineering
+104,david,40,0000,HR
+ID,name,age,salary,department
+
+15.extracts the 4th column from day28.csv and sorts it.
+[2021ict30@fedora ~]$ awk -F, '{print $4}' day28.csv | sort
+0000
+50000
+60000
+62000
+70000
+71000
+72000
+75000
+75000
+80000
+salary
+
+[2021ict30@fedora ~]$ ID,name,age,salary,department
+101,Alice,30,70000,data science
+102,bob,25,50000,engineering
+103,charlie,5,80000,data science
+104,david,40,0000,HR
+105,eve,28,60000,engineering
+106,frank,38,75000,HR
+107,grace,27,72000,data science
+108,frank,38,75000,HR
+109,ivy,29,62000,data science
+110,jack,31,71000,HR^C
+
+16.This command sorts the entire rows of day28.csv based on the 4th column numerically.
+
+[2021ict30@fedora ~]$ sort -t',' -k4,4nr day28.csv -n
+103,charlie,5,80000,data science
+106,frank,38,75000,HR
+108,frank,38,75000,HR
+107,grace,27,72000,data science
+110,jack,31,71000,HR
+101,Alice,30,70000,data science
+109,ivy,29,62000,data science
+105,eve,28,60000,engineering
+102,bob,25,50000,engineering
+104,david,40,0000,HR
+ID,name,age,salary,department
+
+17. keeps the CSV header at the top and sorts the data rows numerically by the 4th column.
+
+[2021ict30@fedora ~]$ head -n 1 day28.csv && tail -n +2 day28.csv | sort -t',' -k4,4n
+ID,name,age,salary,department
+104,david,40,0000,HR
+102,bob,25,50000,engineering
+105,eve,28,60000,engineering
+109,ivy,29,62000,data science
+101,Alice,30,70000,data science
+110,jack,31,71000,HR
+107,grace,27,72000,data science
+106,frank,38,75000,HR
+108,frank,38,75000,HR
+103,charlie,5,80000,data science
+[2021ict30@fedora ~]$
+
