@@ -1,4 +1,5 @@
 Operating Systems IT 2244 
+Day 05 Practical
 
 COMMAND PROMPT PRACTICAL
 
@@ -24,9 +25,13 @@ abc.txt  file.txt  prgram.sh
 1.create an empty file nsmed dsy28.csv (comma seperated file)
 [2021ict30@fedora ~]$ touch day28.csv
 
+-------------------------------------------------------------------------
+
 2.allow to edit
 [2021ict30@fedora ~]$ vi day28.csv
 press i
+
+-------------------------------------------------------------------------
 
 3.type comma seperated data
 
@@ -41,8 +46,12 @@ ID,name,age,salary,department
 109,ivy,29,62000,data science
 110,jack,31,71000,HR
 
+-------------------------------------------------------------------------
+
 4.save the file 
 escape :wq!
+
+-------------------------------------------------------------------------
 
 5.see saved file
 
@@ -59,9 +68,13 @@ ID,name,age,salary,department
 109,ivy,29,62000,data science
 110,jack,31,71000,HR
 
+-------------------------------------------------------------------------
+
 6.used to view the contents of a file one page at a time without opening an editor.
 
 [2021ict30@fedora ~]$ less day28.csv
+
+-------------------------------------------------------------------------
 
 7.searches for and displays all lines in day28.csv that contain the word "engineering"
 The grep command is used to search for a specific pattern in a file.
@@ -69,6 +82,8 @@ The grep command is used to search for a specific pattern in a file.
 [2021ict30@fedora ~]$ grep 'engineering' day28.csv
 102,bob,25,50000,engineering
 105,eve,28,60000,engineering
+
+-------------------------------------------------------------------------
 
 8.print first 7 lines 
 
@@ -81,15 +96,21 @@ ID,name,age,salary,department
 105,eve,28,60000,engineering
 106,frank,38,75000,HR
 
+-------------------------------------------------------------------------
+
 9.prints only the 7th line of day28.csv. 
 
 [2021ict30@fedora ~]$ sed -n '7p' day28.csv
 106,frank,38,75000,HR
 
+-------------------------------------------------------------------------
+
 10.prints only the 3rd line of day28.csv. 
 
 [2021ict30@fedora ~]$ awk 'NR==3' day28.csv
 102,bob,25,50000,engineering
+
+-------------------------------------------------------------------------
 
 11.command extracts and displays the 3rd field (column) from day28.csv, using a comma (,) as the delimiter. 
 
@@ -105,6 +126,8 @@ age
 38
 29
 31
+
+-------------------------------------------------------------------------
 
 12.command sorts day28.csv numerically (-n) based on the 4th column 
 (salary, in this case), using a comma (',') as the field delimiter.
@@ -122,6 +145,8 @@ ID,name,age,salary,department
 108,frank,38,75000,HR
 103,charlie,5,80000,data science
 
+-------------------------------------------------------------------------
+
 13.extracts and prints the 2nd and 3rd columns (separated by a space)
 from day28.csv, using a comma (',') as the field separator. 
 
@@ -138,6 +163,8 @@ frank 38
 ivy 29
 jack 31
 
+-------------------------------------------------------------------------
+
 14.command sorts day28.csv in descending numerical order (-nr) based on
 the 4th column (salary), using a comma (',') as the field delimiter.
 
@@ -153,6 +180,8 @@ the 4th column (salary), using a comma (',') as the field delimiter.
 102,bob,25,50000,engineering
 104,david,40,0000,HR
 ID,name,age,salary,department
+
+-------------------------------------------------------------------------
 
 15.extracts the 4th column from day28.csv and sorts it.
 [2021ict30@fedora ~]$ awk -F, '{print $4}' day28.csv | sort
@@ -180,6 +209,8 @@ salary
 109,ivy,29,62000,data science
 110,jack,31,71000,HR^C
 
+-------------------------------------------------------------------------
+
 16.This command sorts the entire rows of day28.csv based on the 4th column numerically.
 
 [2021ict30@fedora ~]$ sort -t',' -k4,4nr day28.csv -n
@@ -194,6 +225,8 @@ salary
 102,bob,25,50000,engineering
 104,david,40,0000,HR
 ID,name,age,salary,department
+
+-------------------------------------------------------------------------
 
 17. keeps the CSV header at the top and sorts the data rows numerically by the 4th column.
 
