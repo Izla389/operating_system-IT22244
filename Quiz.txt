@@ -1,0 +1,64 @@
+28.04.2025
+operating system practical 
+quiz 1
+
+read three numbers (a,b,c) from the user and store then into three variables. 
+Find the least Common Multiple(LCM) from the first two numbers(a,b) 
+and find the greatest Common Diverser (GCD) for the second two nummbers (b,c).
+
+[2021ict30@fedora ~]$ touch Q1_30.sh
+[2021ict30@fedora ~]$ vi Q1_30.sh
+
+[2021ict30@fedora ~]$ chmod 777 Q1_30.sh
+
+----------------------------------------------------------------------
+gcd() {
+    local a=$1
+    local b=$2
+    while [ $b -ne 0 ]; do
+        temp=$b
+        b=$(( a % b ))
+        a=$temp
+    done
+    echo $a
+}
+
+
+lcm() {
+    local a=$1
+    local b=$2
+    local gcd_ab=$(gcd $a $b)
+    echo $(( (a * b) / gcd_ab ))
+}
+
+
+read -p "Enter first number (a): " a
+read -p "Enter second number (b): " b
+read -p "Enter third number (c): " c
+
+lcm_ab=$(lcm $a $b)
+
+gcd_bc=$(gcd $b $c)
+
+echo "Least Common Multiple (LCM) of $a and $b is: $lcm_ab"
+echo "Greatest Common Divisor (GCD) of $b and $c is: $gcd_bc"
+----------------------------------------------------------------------
+
+[2021ict30@fedora ~]$ ./Q1_30.sh
+Enter first number (a): 12
+Enter second number (b): 6
+Enter third number (c): 9
+Least Common Multiple (LCM) of 12 and 6 is: 12
+Greatest Common Divisor (GCD) of 6 and 9 is: 3
+
+[2021ict30@fedora ~]$ ./Q1_30.sh
+Enter first number (a): 10
+Enter second number (b): 8
+Enter third number (c): 3
+Least Common Multiple (LCM) of 10 and 8 is: 40
+Greatest Common Divisor (GCD) of 8 and 3 is: 1
+
+
+
+
+
