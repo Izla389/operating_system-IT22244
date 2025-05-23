@@ -1,0 +1,204 @@
+one parent under that 2 child, that parent read 3 numbers(A,B,C) from users
+child1 print the factorial of A, under the child2-parent have 2 child,
+that 1child print fibonacci of B, another child print Prime numbers of C. also print the PID of those 
+parent and child 
+
+
+[2021ict30@fedora ~]$ touch p12.c
+[2021ict30@fedora ~]$ vi p12.c
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+// Function to calculate factorial
+void factorial(int n) {
+    long long fact = 1;
+    for (int i = 1; i <= n; i++) {
+        fact *= i;
+    }
+    printf("Child 1 (PID: %d) - Factorial of %d: %lld\n", getpid(), n, fact);
+}
+
+// Function to generate Fibonacci series
+void fibonacci(int n) {
+    printf("Child 2.1 (PID: %d) - Fibonacci of %d: ", getpid(), n);
+    int a = 0, b = 1, temp;
+    for (int i = 0; i < n; i++) {
+        printf("%d ", a);
+        temp = a + b;
+        a = b;
+        b = temp;
+    }
+    printf("\n");
+}
+
+// Function to print prime numbers up to n
+void prime_numbers(int n) {
+    printf("Child 2.2 (PID: %d) - Prime numbers up to %d: ", getpid(), n);
+    for (int num = 2; num <= n; num++) {
+        int is_prime = 1;
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) {
+                is_prime = 0;
+                break;
+            }
+        }
+        if (is_prime) {
+            printf("%d ", num);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int A, B, C;
+    printf("Enter three numbers (A, B, C): ");
+    scanf("%d %d %d", &A, &B, &C);
+
+    printf("Parent (PID: %d) starts...\n", getpid());
+
+    pid_t child1 = fork();
+    if (child1 == 0) {
+        factorial(A);
+        exit(0);
+    }
+
+    pid_t child2 = fork();
+    if (child2 == 0) {
+        pid_t child2_1 = fork();
+        if (child2_1 == 0) {
+            fibonacci(B);
+            exit(0);
+        }
+
+        pid_t child2_2 = fork();
+        if (child2_2 == 0) {
+            prime_numbers(C);
+            exit(0);
+        }
+
+        // Parent of child2_1 and child2_2 waits
+        wait(NULL);
+        wait(NULL);
+        exit(0);
+    }
+
+    // Parent waits for both child1 and child2 to finish
+    wait(NULL);
+    wait(NULL);
+    
+    printf("Parent (PID: %d) ends...\n", getpid());
+    return 0;
+}
+
+
+
+[2021ict30@fedora ~]$ gcc p12.c -o p12
+[2021ict30@fedora ~]$ ./p12
+
+
+Enter three numbers (A, B, C): 3 4 2
+Parent (PID: 10471) starts...
+Child 1 (PID: 10486) - Factorial of 3: 6
+Child 2.1 (PID: 10488) - Fibonacci of 4: 0 1 1 2
+Child 2.2 (PID: 10489) - Prime numbers up to 2: 2
+Parent (PID: 10471) ends...
+[2021ict30@fedora ~]$
+
+------------------------------------------------------------------------------------------------------------------
+
+
+[2021ict30@fedora ~]$ touch p16.c
+[2021ict30@fedora ~]$ vi p16.c
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    int n;
+    printf("Enter number: ");
+    scanf("%d", &n);  // Use &n to store the value at the address of n
+
+    int child1 = fork();  // First fork
+
+    if (child1 == 0) {
+        // Child1 process
+        printf("Child1 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+        // Factorial calculation
+        int fact = 1;
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
+        }
+        printf("Factorial of %d is %d\n", n, fact);
+
+        // Child of child1 - for Fibonacci
+        int child5 = fork();
+        if (child5 == 0) {
+            printf("Child5 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+            int a = 0, b = 1, fib = 0;
+            for (int j = 1; j < n; j++) {
+                fib = a + b;
+                a = b;
+                b = fib;
+            }
+            printf("Fibonacci term at position %d is %d\n", n, (n == 0) ? 0 : (n == 1) ? 1 : fib);
+        } else {
+            wait(NULL);  // Wait for child5
+        }
+
+    } else {
+        // Parent process
+
+        int child2 = fork();  // Second fork
+        if (child2 == 0) {
+            printf("Child2 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+            int s = 1;
+            for (int k = 0; k < n; k++) {
+                s *= 2;
+            }
+            printf("2 to the power of %d is %d\n", n, s);
+
+        } else {
+            int child3 = fork();  // Third fork
+            if (child3 == 0) {
+                printf("Child3 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+                int square = n * n;
+                printf("Square of %d is %d\n", n, square);
+            } else {
+                // Parent waits for all its children
+                wait(NULL);
+                wait(NULL);
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+[2021ict30@fedora ~]$ gcc p16.c -o p16
+
+[2021ict30@fedora ~]$ ./p16
+Enter number: 5
+Child1 -> PID: 1234 	 PPID: 1233
+Factorial of 5 is 120
+Child5 -> PID: 1235 	 PPID: 1234
+Fibonacci term at position 5 is 5
+Child2 -> PID: 1236 	 PPID: 1233
+2 to the power of 5 is 32
+Child3 -> PID: 1237 	 PPID: 1233
+Square of 5 is 25
+
+
+
