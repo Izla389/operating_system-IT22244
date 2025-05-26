@@ -1,0 +1,137 @@
+[2021ict30@fedora ~]$ touch p18.c
+[2021ict30@fedora ~]$ vi p18.c
+
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    int n;
+    printf("Enter number: ");
+    scanf("%d", &n);  // Use &n to store the value at the address of n
+
+    int child1 = fork();  // First fork
+
+    if (child1 == 0) {
+        // Child1 process
+        printf("Child1 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+        // Factorial calculation
+        int fact = 1;
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
+        }
+        printf("Factorial of %d is %d\n", n, fact);
+
+        // Child of child1 - for Fibonacci
+        int child5 = fork();
+        if (child5 == 0) {
+            printf("Child5 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+            int a = 0, b = 1, fib = 0;
+            for (int j = 1; j < n; j++) {
+                fib = a + b;
+                a = b;
+                b = fib;
+            }
+            printf("Fibonacci term at position %d is %d\n", n, (n == 0) ? 0 : (n == 1) ? 1 : fib);
+        } else {
+            wait(NULL);  // Wait for child5
+        }
+
+    } else {
+        // Parent process
+
+        int child2 = fork();  // Second fork
+        if (child2 == 0) {
+            printf("Child2 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+
+            int s = 1;
+            for (int k = 0; k < n; k++) {
+                s *= 2;
+            }
+            printf("2 to the power of %d is %d\n", n, s);
+
+        } else {
+            int child3 = fork();  // Third fork
+            if (child3 == 0) {
+                printf("Child3 -> PID: %d \t PPID: %d\n", getpid(), getppid());
+                int square = n * n;
+                printf("Square of %d is %d\n", n, square);
+            } else {
+                // Parent waits for all its children
+                wait(NULL);
+                wait(NULL);
+            }
+        }
+    }
+
+    return 0;
+}
+
+[2021ict30@fedora ~]$ gcc p18.c -o p18
+[2021ict30@fedora ~]$ ./p18
+
+
+Enter number: 25
+Child1 -> PID: 6716      PPID: 6594
+Factorial of 25 is 2076180480
+Child2 -> PID: 6717      PPID: 6594
+2 to the power of 25 is 33554432
+Child3 -> PID: 6718      PPID: 6594
+Square of 25 is 625
+Child5 -> PID: 6719      PPID: 6716
+Fibonacci term at position 25 is 75025
+
+
+
+
+
+This C program demonstrates **process creation and communication** using `fork()`. Here's what it does:
+
+### **Overview of Functionality:**
+- The program takes an integer **n** as input.
+- It creates multiple **child processes** to compute different mathematical operations:
+  - **Child 1** calculates the **factorial** of `n`.
+  - **Child 5** (created by Child 1) computes the **nth Fibonacci term**.
+  - **Child 2** computes **2 to the power of n**.
+  - **Child 3** calculates the **square** of `n`.
+
+### **Breakdown of Execution:**
+1. **Parent Process**:
+   - The parent process creates Child 1, Child 2, and Child 3.
+   - It waits for Child 2 and Child 3 to finish.
+
+2. **Child 1 (Factorial Calculation)**:
+   - Computes `n!` using a loop.
+   - Creates **Child 5**, which calculates the **nth Fibonacci term**.
+
+3. **Child 2 (Exponentiation)**:
+   - Computes `2^n` using a loop.
+
+4. **Child 3 (Square Calculation)**:
+   - Computes `n * n`.
+
+5. **Child 5 (Fibonacci Calculation)**:
+   - Determines the **nth** Fibonacci number using iteration.
+
+### **Process Hierarchy:**
+- **Parent**
+  - ├── **Child 1** (Factorial)
+      - ├── **Child 5** (Fibonacci)
+  - ├── **Child 2** (2ⁿ)
+  - ├── **Child 3** (Square)
+
+### **Key Concepts Demonstrated:**
+- **Process creation** using `fork()`.
+- **Parent-child relationships** in processes.
+- **Synchronization** using `wait()` to ensure child processes complete.
+- **Mathematical computations** distributed across multiple processes.
+
+
+----------------------------------------------------------------------------
+
+
+
