@@ -1,0 +1,273 @@
+[2021ict30@fedora ~]$ touch p19.c
+[2021ict30@fedora ~]$ vi p19.c
+
+#include<stdio.h>
+#include<stdlib.h> //for exit()
+#include<unistd.h> //for sleep()
+
+int main()
+{
+	printf("Program started.\n");
+	
+	printf("Sleeping for 3 seconds...\n");
+	sleep(3); //pause for 3 seconds
+	
+	printf("Exiiting the programe.\n");
+	exit(0); // clean exit
+}
+
+[2021ict30@fedora ~]$ gcc p19.c -o p19
+[2021ict30@fedora ~]$ ./p19
+
+Program started.
+Sleeping for 3 seconds...
+Exiiting the programe.
+
+-----------------------------------------------------------------------------------
+
+[2021ict30@fedora ~]$ touch p20.c
+[2021ict30@fedora ~]$ vi p20.c
+
+#include<stdio.h>
+#include<stdlib.h> //for exit()
+#include<unistd.h> //for sleep()
+#include<sys/wait.h> // for wait()
+
+int main()
+{
+	pid_t pid; //initialize pid
+	
+	printf("parent process started. PID: %d\n", getpid());
+	
+	pid= fork();//create a new child process
+	
+	if(pid<0)
+	{
+		perror("fork failled");
+		exit(1);
+	}
+	
+	if(pid==0)
+	{
+		//child process
+		printf("child process. PId: %d, sleeping for 2 second...\n", getpid());
+		sleep(2);
+		printf("child process exiting.\n");
+		exit(0); //child exits with status 0
+	}
+	else
+	{
+		//parent process
+		int status;
+		printf("parent waiting for child for finish...\n");
+		wait(&status);// wait for child to finish
+		if(WIFEXITED(status))
+		{
+			printf("child exited with status: %d\n", WEXITSTATUS(status));
+			//WEXITSTATUS(status) gets teh actuall code (0 here).
+		}
+		else
+		{
+			printf("child did not exit normally.\n");
+		}
+		printf("parent process ending.\n");
+	}
+	
+	return 0;
+}
+
+[2021ict30@fedora ~]$ gcc p20.c -o p20
+[2021ict30@fedora ~]$ ./p20
+
+parent process started. PID: 9939
+parent waiting for child for finish...
+child process. PId: 9940, sleeping for 2 second...
+
+child process exiting.
+child exited with status: 0
+parent process ending.
+
+-----------------------------------------------------------------------------------
+Exercise 1
+
+First child : slept for 1 second
+Second child: slept for 3 seconds
+parent: Both childeren have finished
+
+[2021ict30@fedora ~]$ touch p21.c
+[2021ict30@fedora ~]$ vi p21.c
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t child1, child2;
+
+    child1 = fork();  // First child process
+    if (child1 == 0) {
+        // First child process
+        printf("First child: slept for 1 second\n");
+        sleep(1);
+        printf("First child: finished\n");
+        return 0;  // Exit child process
+    }
+
+    child2 = fork();  // Second child process
+    if (child2 == 0) {
+        // Second child process
+        printf("Second child: slept for 3 seconds\n");
+        sleep(3);
+        printf("Second child: finished\n");
+        return 0;  // Exit child process
+    }
+
+    // Parent process waits for both children
+    wait(NULL);
+    wait(NULL);
+    
+    printf("Parent: Both children have finished\n");
+
+    return 0;
+}
+
+
+
+
+[2021ict30@fedora ~]$ gcc p21.c -o p21
+[2021ict30@fedora ~]$ ./p21
+
+First child: slept for 1 second
+Second child: slept for 3 seconds
+
+First child: finished
+
+Second child: finished
+Parent: Both children have finished
+
+
+-----------------------------------------------------------------------------------
+
+Exercise 2
+
+First child : sleep for 2 seconds, exit with status 2
+Second child: sleep for 1 seconds, exit with status 1
+parent:wait twice, and prints which child(by PID or exit code)
+finished first and second
+
+
+[2021ict30@fedora ~]$ touch ex2.c
+[2021ict30@fedora ~]$ vi ex2.c
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t child1, child2;
+    int status;
+
+    child1 = fork();  // First child process
+    if (child1 == 0) {
+        sleep(2);  // First child sleeps for 2 seconds
+        printf("First child: slept for 2 seconds, exiting with status 2\n");
+        return 2;  // Exiting with status 2
+    }
+
+    child2 = fork();  // Second child process
+    if (child2 == 0) {
+        sleep(1);  // Second child sleeps for 1 second
+        printf("Second child: slept for 1 second, exiting with status 1\n");
+        return 1;  // Exiting with status 1
+    }
+
+    // Parent waits for the first finished child
+    pid_t finished_child1 = wait(&status);
+    printf("Parent: Child (PID: %d) finished first with exit code %d\n", finished_child1, WEXITSTATUS(status));
+
+    // Parent waits for the second finished child
+    pid_t finished_child2 = wait(&status);
+    printf("Parent: Child (PID: %d) finished second with exit code %d\n", finished_child2, WEXITSTATUS(status));
+
+    return 0;
+}
+
+[2021ict30@fedora ~]$ gcc ex2.c -o ex2
+[2021ict30@fedora ~]$ ./ex2
+
+Second child: slept for 1 second, exiting with status 1
+Parent: Child (PID: 14062) finished first with exit code 1
+
+First child: slept for 2 seconds, exiting with status 2
+Parent: Child (PID: 14061) finished second with exit code 2
+
+-----------------------------------------------------------------------------------
+
+Exercise 3
+
+The parent creates child proocess.
+The child creates a granchild process.
+The grandchild sleeps 2 second and exit with status 2.
+The child waits for the grandchild, prints its exit status,
+then exits with status 55
+
+
+[2021ict30@fedora ~]$ touch ex3.c
+[2021ict30@fedora ~]$ vi ex3.c
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t child, grandchild;
+    int status;
+
+    child = fork();  // Create child process
+    if (child == 0) { 
+        // Child process
+        grandchild = fork();  // Create grandchild process
+        if (grandchild == 0) { 
+            // Grandchild process
+            sleep(2);
+            printf("Grandchild: Slept for 2 seconds, exiting with status 2\n");
+            return 2;  // Exit with status 2
+        } 
+
+        // Child waits for grandchild to finish
+        wait(&status);
+        printf("Child: Grandchild exited with status %d\n", WEXITSTATUS(status));
+        
+        return 55;  // Exit with status 55
+    } 
+
+    // Parent process waits for child to finish
+    wait(&status);
+    printf("Parent: Child exited with status %d\n", WEXITSTATUS(status));
+
+    return 0;
+}
+
+
+
+[2021ict30@fedora ~]$ gcc ex3.c -o ex3
+[2021ict30@fedora ~]$ ./ex3
+
+Grandchild: Slept for 2 seconds, exiting with status 2
+Child: Grandchild exited with status 2
+Parent: Child exited with status 55
+
+-----------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
