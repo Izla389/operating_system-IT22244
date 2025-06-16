@@ -1,0 +1,234 @@
+[2021ict30@fedora ~]$ vi thread1.c
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+//a normal c function that is excuted as a threas 
+// when its name is specified in pthread_create()
+
+
+void *helloWorld(void *vargp)
+{
+	sleep(1);
+	printf("Hello world \n");
+	return NULL;
+}
+
+int main()
+{
+	pthread_t thread_id;
+	printf("thread \n");
+	pthread_create(&thread_id, NULL, helloWorld, NULL);
+	pthread_join(thread_id, NULL);
+	printf("After thread \n");
+	exit(0);
+	
+	
+}
+
+[2021ict30@fedora ~]$ gcc thread1.c -o thread1
+
+[2021ict30@fedora ~]$ ./thread1
+thread
+Hello world
+After thread
+
+//conclusion
+
+1. pthread.h – provides functions for thread creation and management
+2. pthread_t thread_id;
+
+	Declares a variable to store the thread ID.
+
+3.printf("thread \n");
+
+	Prints a message before starting the thread.
+
+4. pthread_create(...)
+
+	Creates a new thread that runs the helloWorld function.
+
+	Arguments:
+
+	&thread_id: where the ID of the created thread is stored.
+
+	NULL: default thread attributes.
+
+	helloWorld: function to run.
+
+	NULL: no argument is passed to the thread.
+
+5. pthread_join(thread_id, NULL);
+
+	Waits for the created thread to finish before continuing.
+
+	This ensures "After thread" is printed after "Hello world".
+
+6. exit(0);
+
+	Terminates the main thread cleanly.
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+multi-threaded process
+
+[2021ict30@fedora ~]$ vi thread2.c
+
+
+#include <stdio.h>
+#include <pthread.h>
+
+//function to be executed by the thread
+void* print_message(void* arg)
+{
+	char* message = (char*)arg;
+	printf("%s\n", message);
+	return NULL;
+}
+
+int main()
+{
+	pthread_t thread1, thread2;
+	
+	//create first thread
+	pthread_create(&thread1, NULL, print_message, "hello from thread 1 !");
+	
+	//create second thread
+	pthread_create(&thread2, NULL, print_message, "hello from thread 2 !");
+	
+	//wait for both threads to finish
+	pthread_join(thread1, NULL);
+	pthread_join(thread2, NULL);
+	
+	printf("Both threads completed. \n");
+	return 0;
+	
+}
+
+[2021ict30@fedora ~]$ gcc thread2.c -o thread2
+
+[2021ict30@fedora ~]$ ./thread2
+hello from thread 1 !
+hello from thread 2 !
+Both threads completed.
+
+
+//conclusion
+It creates two threads (thread1 and thread2).
+
+Each thread runs the function print_message with a different string argument.
+
+Each thread prints its message to the console.
+
+The main function waits for both threads to finish using pthread_join.
+
+After both threads complete, it prints "Both threads completed."
+
+Threads run concurrently, so the order of the messages from the two threads may vary each time you run the program.
+
+Using pthread_join ensures the main program waits for both threads to finish before printing the final message.
+
+This example shows how to pass arguments (strings) to threads safely.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+[2021ict30@fedora ~]$ vi thread32.c
+
+// Basic thread creation
+#include <stdio.h>
+#include <pthread.h>
+
+// Function to be executed by the thread
+void* print_message(void* arg)
+{
+    char* message = (char*)arg;
+    printf("%s\n", message);
+    return NULL;
+}
+
+int main()
+{
+    pthread_t threads[3];
+
+    char* message[] = {
+        "Thread 1 says hi!",
+        "Thread 2 says hello!",
+        "Thread 3 says hey!"
+    };
+
+    // Create threads
+    for(int i = 0; i < 3; i++) {
+        pthread_create(&threads[i], NULL, print_message, message[i]);
+    }
+
+    // Wait for all threads to finish
+    for(int i = 0; i < 3; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    printf("All threads done.\n");
+
+    return 0;
+}
+
+[2021ict30@fedora ~]$ gcc thread32.c -o thread32
+[2021ict30@fedora ~]$ ./thread32
+Thread 1 says hi!
+Thread 2 says hello!
+Thread 3 says hey!
+All threads done.
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+using Theread to compute parts od a sum (Parallel sum)
+
+[2021ict30@fedora ~]$ vi thread4.c
+
+
+#include <stdio.h>
+#include <pthread.h>
+
+#define SIZE 6
+
+int arr[SIZE] = {1,2,3,4,5,6};
+int sum1 = 0; sum2=0;
+
+void* sum_part1(void* arg){
+	for (int i=0; i< SIZE/2; i++){
+		sum1 += arr[i];
+	}
+	return NULL;
+}
+
+void* sum_part2(void* arg){
+	for (int i=0; i< SIZE/2; i++){
+		sum1 += arr[i];
+	}
+	return NULL;
+}
+
+int main(){
+	pthread_t t1,t2;
+	
+	pthread_create(&t1, NULL, sum_part1, NULL);
+	pthread_create(&t2, NULL, sum_part2, NULL);
+	
+	pthread_join(t1, NULL);
+	pthread_join(t2, NULL);
+	
+	printf("Total sum = %d\n", sum1 + sum2);
+	
+	return 0;
+}
+
+[2021ict30@fedora ~]$ gcc thread32.c -o thread32
+[2021ict30@fedora ~]$ ./thread32
+
+Total sum = 21
+
+
+
